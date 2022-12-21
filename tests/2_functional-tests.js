@@ -47,9 +47,17 @@ suite('Functional Tests', function () {
     });
     // #4
     test('Send {surname: "da Verrazzano"}', function (done) {
-      assert.fail();
-
-      done();
+      chai
+        .request(server)
+        .put('/travellers')
+        .send({ 'surname': 'da Verrazzano' })
+        .end(function (err, res) {
+          assert.equal(res.status, 200);
+          assert.equal(res.type, 'application/json');
+          assert.equal(res.body.name, 'Giovanni');
+          assert.equal(res.body.surname, 'da Verrazzano');
+          done();
+      });
     });
   });
 });
@@ -58,8 +66,12 @@ const Browser = require('zombie');
 
 suite('Functional Tests with Zombie.js', function () {
   this.timeout(5000);
+  Browser.site = 'https://boilerplate-mochachai.makotoaraki.repl.co';
+  const browser = new Browser();
 
-
+  suiteSetup(function(done) {
+    return browser.visit('/', done);
+  });
 
   suite('Headless browser', function () {
     test('should have a working "site" property', function() {
